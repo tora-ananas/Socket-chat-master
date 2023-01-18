@@ -38,7 +38,7 @@ public class ServerSomething extends Thread{
         in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
         byteOut = new DataOutputStream(socketCam.getOutputStream());
-        //webcam.setViewSize(new Dimension(320, 240));
+        webcam.setViewSize(new Dimension(320, 240));
     }
 
     @Override
@@ -90,7 +90,6 @@ public class ServerSomething extends Thread{
         final String preparedMessage = getPreparedMessage(message);
         sendMessage(preparedMessage);
         if(Server.Command.NEXT.equalCommand(message)){
-            byteOut.writeInt(byteArray.length);
             byteOut.write(byteArray);
             byteOut.flush();
             System.out.println("byteOut done" + byteArray.length);
@@ -112,6 +111,7 @@ public class ServerSomething extends Thread{
             serialPort.writeBytes(bytes, bytes.length);
         }
         if (Server.Command.STOP_CLIENT.equalCommand(message)) {
+            System.out.println("ЗАКРЫЛО");
             downService();
             return false;
         } else if (Server.Command.STOP_ALL_CLIENTS.equalCommand(message) || Server.Command.STOP_SERVER.equalCommand(message)) {
@@ -129,7 +129,12 @@ public class ServerSomething extends Thread{
 
     private void sendMessage(final String message) throws IOException {
         System.out.println(message);
-        server.history.addHistoryEvent(message);
+        try {
+            server.history.addHistoryEvent(message);
+        }
+        catch (NullPointerException ex) {
+            downService();
+        }
         for (final ServerSomething ss : server.serverList) {
             ss.send(message);
         }
@@ -197,6 +202,8 @@ public class ServerSomething extends Thread{
      */
     private void downService() {
         try {
+            if (webcam.isOpen())
+                webcam.close();
             if (!socket.isClosed()) {
                 socket.close();
                 in.close();

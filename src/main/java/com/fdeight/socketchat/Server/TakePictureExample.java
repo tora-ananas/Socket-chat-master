@@ -24,15 +24,20 @@ public class TakePictureExample {
 
         // get default webcam and open it
         Webcam webcam = Webcam.getDefault();
+        webcam.setViewSize(new Dimension(320, 240));
         System.out.println(webcam.getViewSize());
         webcam.open();
         CanvasFrame canvas = new CanvasFrame(" ");
 
+        while (true){
+            BufferedImage image = webcam.getImage();
+            canvas.showImage(image);
+        }
         // get image
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        //ByteArrayOutputStream baos = new ByteArrayOutputStream();
         //ImageIO.write(image, )
-        BufferedImage image = webcam.getImage();
-        ImageIO.write(image, "png", baos);
+
+        /*ImageIO.write(image, "png", baos);
         baos.flush();
         byte[] bytes = baos.toByteArray();
         baos.close();
@@ -41,7 +46,7 @@ public class TakePictureExample {
         ByteBuffer bytes1 = webcam.getImageBytes();
         byte[] arr = new byte[bytes1.remaining()];
         bytes1.get(arr);
-        System.out.println(arr.length);
+        System.out.println(arr.length);*/
         /*System.out.println(image.getHeight());
         System.out.println(image.getWidth());
         ByteBuffer bytes = webcam.getImageBytes();
